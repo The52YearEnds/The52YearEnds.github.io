@@ -122,6 +122,9 @@ h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.75rem; mar
 .tip { justify-self: start; display: inline-block; background: var(--oxblood); color: var(--fg); text-decoration: none; font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.85rem 1.5rem; border-radius: 2px; border: 1px solid var(--oxblood-hi); }
 .tip:hover { background: var(--oxblood-hi); }
 .fine { font-size: 0.95rem; color: var(--muted); }
+.contact { display: grid; gap: 0.6rem; border-top: 1px solid var(--line); padding-top: 1.1rem; margin-top: 0.4rem; }
+.contact-label { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--brass); }
+#email-link { font-family: var(--font-mono); font-size: 0.95rem; user-select: all; overflow-wrap: anywhere; }
 
 footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 1rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; letter-spacing: 0.04em; }
 
@@ -173,7 +176,7 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
     <section class="hero">
       <div class="hero-text">
         <p class="eyebrow">Fifty-two Fridays · one year</p>
-        <h1>A new story every Friday.</em></h1>
+        <h1>A new story every Friday.</h1>
         <p class="lede"> Welcome, friend. I appreciate the visit. If you find value each week in my stories, then I have accomplished everything I set out to do. </p>
         <div class="countdown" id="countdown" aria-live="off">
           <p class="cd-label" id="cd-label">Week 1 arrives in</p>
@@ -218,6 +221,11 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
     <p>Pull up a chair. The tea's still warm, and I'm glad you found the place.</p>
     <p>I'm a lifelong nerd who runs D&amp;D twice a week, which mostly means building kingdoms so my players can find new ways to set them on fire. By day, I work in finance somewhere cold in the Midwest. By night, I'm earning a dual master's, an MBA and an MS in Management Information Systems, because one degree felt too sensible.</p>
     <p>This is where the stories go. Every Friday for a year, something new goes up: the next chapter, or a standalone that wandered in from one of my worlds.</p>
+    <div class="contact">
+      <p class="contact-label">Say hello</p>
+      <p><a id="email-link" href="mailto:the52yearends@gmail.com">the52yearends@gmail.com</a></p>
+      <div class="links" id="about-links"></div>
+    </div>
   </section>
 
   <!-- SUPPORT VIEW -->
@@ -244,12 +252,12 @@ const SITE = {
   start: "2026-10-23",      // Friday of week 1
   releaseHour: 0,           // hour each Friday's story drops, Central time (0 = midnight, 9 = 9 AM)
   kofi: "https://ko-fi.com/",
+  email: "the52yearends@gmail.com",
   links: [
-    ["Royal Road", "https://www.royalroad.com/"],
-    ["Bluesky", "https://bsky.app/"],
-    ["X", "https://x.com/"],
-    ["Threads", "https://www.threads.net/"],
-    ["Reddit", "https://www.reddit.com/"]
+    ["Royal Road", "https://www.royalroad.com/profile/1105409"],
+    ["Bluesky", "https://bsky.app/profile/the52yearends.bsky.social"],
+    ["Reddit", "https://www.reddit.com/user/52yearends"]
+    // ["AO3", "https://archiveofourown.org/users/YOURNAME"]   <- remove the // and add a comma above when ready
   ]
 };
 
@@ -370,12 +378,15 @@ if (!STORIES.length) {
   list.appendChild(art);
 });
 
-const links = el("links");
-SITE.links.forEach(([name, url]) => {
-  const a = document.createElement("a");
-  a.href = url; a.target = "_blank"; a.rel = "noopener"; a.textContent = name;
-  links.appendChild(a);
+["links", "about-links"].forEach(id => {
+  SITE.links.forEach(([name, url]) => {
+    const a = document.createElement("a");
+    a.href = url; a.target = "_blank"; a.rel = "noopener"; a.textContent = name;
+    el(id).appendChild(a);
+  });
 });
+el("email-link").href = "mailto:" + SITE.email;
+el("email-link").textContent = SITE.email;
 
 const views = { stories: "view-stories", about: "view-about", support: "view-support" };
 function show() {
