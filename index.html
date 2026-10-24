@@ -106,6 +106,17 @@ h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.75rem; mar
 .up-teaser { margin: 0; color: var(--muted); font-size: 1rem; }
 @media (max-width: 40rem) { .up-grid { grid-template-columns: 1fr; } }
 
+/* Art */
+.gallery-view { display: grid; gap: 1rem; }
+.gallery-view .lede { margin: 0; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr)); gap: 1rem; }
+.art-card { margin: 0; display: grid; gap: 0.6rem; background: var(--surface); border: 1px solid var(--line); border-radius: 2px; padding: 0.6rem; min-width: 0; }
+.art-card a { display: block; line-height: 0; }
+.art-card img { width: 100%; height: auto; max-width: 100%; display: block; border-radius: 1px; }
+.art-card figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.3rem 0.8rem; padding: 0 0.2rem 0.2rem; }
+.art-title { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; }
+.art-note { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--brass); }
+
 /* Story list */
 .stories { display: grid; gap: 0; }
 .stories .sec-head { margin-bottom: 0.25rem; }
@@ -181,6 +192,7 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
     </a>
     <nav aria-label="Site">
       <a href="#stories" data-view="stories">Stories</a>
+      <a href="#art" data-view="art">Art</a>
       <a href="#about" data-view="about">About</a>
       <a href="#support" data-view="support">Support</a>
     </nav>
@@ -240,7 +252,7 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
     <h2>Welcome to the show</h2>
     <p>Pull up a chair. The tea's still warm, and I'm glad you found the place.</p>
     <p>I'm a lifelong nerd who runs D&amp;D twice a week, which mostly means building kingdoms so my players can find new ways to set them on fire. By day, I work in finance somewhere cold in the Midwest. By night, I'm earning a dual master's, an MBA and an MS in Management Information Systems, because one degree felt too sensible.</p>
-    <p>And if you write, keep going. Start the story you keep putting off, finish the one sitting in the drawer, and share it with me on Bluesky or Reddit. I'd love to read it.</p>
+    <p>And if you write, keep going. Start the story you keep putting off, finish the one sitting in the drawer, and share it with me on any social media. I'd love to read it.</p>
     <div class="contact">
       <p class="contact-label">Find me</p>
       <div class="links" id="about-links"></div>
@@ -249,11 +261,19 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
     </div>
   </section>
 
+  <!-- ART VIEW -->
+  <section id="view-art" class="gallery-view" hidden>
+    <div class="sec-head"><h2>Art</h2></div>
+    <p class="lede">Covers, sketches and pieces from the worlds behind the stories.</p>
+    <div class="gallery" id="gallery"></div>
+  </section>
+
   <!-- SUPPORT VIEW -->
   <section id="view-support" class="prose" hidden>
     <h2>Keep the lamp lit</h2>
-    <p>Every story here is free to read, and always will be. If one of them earned its place in your week, a tip helps keep the Fridays coming.</p>
-    <a class="tip" id="kofi" href="#" target="_blank" rel="noopener">Leave a tip on Ko-fi</a>
+    <p>Thank you for the thought. It means more than you know.</p>
+    <p>Every story here is free to read, and always will be. A way to support the project is on its way: as everything comes together, a link will appear right here.</p>
+    <a class="tip" id="kofi" href="#" target="_blank" rel="noopener" hidden>Leave a tip on Ko-fi</a>
   </section>
 
   <footer>
@@ -271,7 +291,7 @@ const SITE = {
   brand: "The52YearEnds",
   start: "2026-10-30",      // Friday of week 1
   releaseHour: 0,           // hour each Friday's story drops, Central time (0 = midnight, 9 = 9 AM)
-  kofi: "https://ko-fi.com/",
+  kofi: "",                 // paste your Ko-fi link here when ready; the Support button appears once it's filled in
   email: "the52yearends@gmail.com",
   links: [
     ["Royal Road", "https://www.royalroad.com/profile/1105409"],
@@ -281,6 +301,12 @@ const SITE = {
     ["AO3", "https://archiveofourown.org/"]    // replace with your AO3 profile link
   ]
 };
+
+// ART: one entry per piece, newest first. Upload the image file next to index.html on GitHub.
+// note is optional (e.g. "Work in progress").
+const ART = [
+  { title: "The 917th: cover art", note: "Work in progress", image: "917th-cover-wip.webp", alt: "Work-in-progress cover sketch: a gas-masked soldier in a dark hood looks up at a falling shell." }
+];
 
 // Add the newest story at the top. Example (copy, paste between the brackets, edit):
 // { week: 1, type: "serial", chapter: 1, title: "Title", blurb: "One-line hook.", url: "https://..." },
@@ -371,7 +397,7 @@ document.title = SITE.brand;
 document.getElementById("brand-name").textContent = SITE.brand;
 document.getElementById("foot-name").textContent = "© " + SITE.brand;
 document.getElementById("foot-start").textContent = "Week 1 · " + dateLabel(1);
-document.getElementById("kofi").href = SITE.kofi;
+if (SITE.kofi) { document.getElementById("kofi").href = SITE.kofi; document.getElementById("kofi").hidden = false; }
 
 // Countdown to the next Friday release; rolls over to the following Friday on its own.
 const el = id => document.getElementById(id);
@@ -495,7 +521,15 @@ if (!STORIES.length) {
 el("email-link").href = "mailto:" + SITE.email;
 el("email-link").textContent = SITE.email;
 
-const views = { stories: "view-stories", about: "view-about", support: "view-support" };
+// Art gallery
+ART.forEach(a => {
+  const fig = document.createElement("figure");
+  fig.className = "art-card";
+  fig.innerHTML = `<a href="${esc(a.image)}" target="_blank" rel="noopener"><img src="${esc(a.image)}" alt="${esc(a.alt || a.title)}" loading="lazy"></a><figcaption><span class="art-title">${esc(a.title)}</span>${a.note ? `<span class="art-note">${esc(a.note)}</span>` : ""}</figcaption>`;
+  el("gallery").appendChild(fig);
+});
+
+const views = { stories: "view-stories", art: "view-art", about: "view-about", support: "view-support" };
 function show() {
   const key = views[location.hash.slice(1)] ? location.hash.slice(1) : "stories";
   Object.entries(views).forEach(([k, id]) => { el(id).hidden = k !== key; });
