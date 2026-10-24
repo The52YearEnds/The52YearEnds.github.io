@@ -290,7 +290,7 @@ footer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); 
 const SITE = {
   brand: "The52YearEnds",
   start: "2026-10-30",      // Friday of week 1
-  releaseHour: 0,           // hour each Friday's story drops, Central time (0 = midnight, 9 = 9 AM)
+  releaseHour: 12,          // hour each Friday's story drops, Central time (12 = noon, 0 = midnight)
   kofi: "",                 // paste your Ko-fi link here when ready; the Support button appears once it's filled in
   email: "the52yearends@gmail.com",
   links: [
@@ -428,7 +428,7 @@ function tick() {
   el("cd-h").textContent = pad(h);
   el("cd-m").textContent = pad(m);
   el("cd-s").textContent = pad(s);
-  el("cd-when").textContent = when + " · Central time";
+  el("cd-when").textContent = when + " · " + (SITE.releaseHour === 12 ? "noon" : SITE.releaseHour === 0 ? "midnight" : (SITE.releaseHour % 12 || 12) + (SITE.releaseHour < 12 ? " AM" : " PM")) + " Central";
 }
 tick();
 setInterval(tick, 1000);
